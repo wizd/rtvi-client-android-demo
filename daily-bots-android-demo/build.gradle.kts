@@ -5,6 +5,19 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+// 读取.env文件
+val dailyApiKey = try {
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.readLines()
+            .firstOrNull { it.startsWith("DAILY_API_KEY=") }
+            ?.substringAfter("DAILY_API_KEY=")
+            ?: ""
+    } else ""
+} catch (e: Exception) {
+    ""
+}
+
 android {
     namespace = "co.daily.bots.demo"
     compileSdk = 34
@@ -15,6 +28,9 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        // 添加API密钥到BuildConfig
+        buildConfigField("String", "DAILY_API_KEY", "\"$dailyApiKey\"")
 
         vectorDrawables {
             useSupportLibrary = true
